@@ -30,8 +30,8 @@ export async function POST(request: NextRequest) {
     // 创建简单的Word文档 (Office Open XML格式)
     const docxBuffer = await createDocx(extractedContent, file.name.replace(".pages", ""));
 
-    // 返回docx文件
-    return new NextResponse(docxBuffer, {
+    // 返回docx文件 (转换Buffer为Uint8Array以兼容NextResponse)
+    return new NextResponse(new Uint8Array(docxBuffer), {
       status: 200,
       headers: {
         "Content-Type": "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
