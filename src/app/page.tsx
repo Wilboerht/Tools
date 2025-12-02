@@ -1,65 +1,94 @@
-import Image from "next/image";
+import Link from "next/link";
+import { Link2, QrCode, FileText, ArrowRight } from "lucide-react";
+
+const tools = [
+  {
+    id: "shorturl",
+    name: "短链接生成",
+    description: "将长网址转换为简短易分享的短链接",
+    icon: Link2,
+    color: "from-blue-500 to-cyan-500",
+    href: "/shorturl",
+  },
+  {
+    id: "qrcode",
+    name: "二维码生成",
+    description: "将任意链接或文本转换为二维码图片",
+    icon: QrCode,
+    color: "from-purple-500 to-pink-500",
+    href: "/qrcode",
+  },
+  {
+    id: "pages-to-word",
+    name: "Pages转Word",
+    description: "将Apple Pages文档转换为Microsoft Word格式",
+    icon: FileText,
+    color: "from-orange-500 to-red-500",
+    href: "/pages-to-word",
+  },
+];
 
 export default function Home() {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex min-h-screen w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
-          </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
-        </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
+    <div>
+      {/* Hero Section */}
+      <section className="text-center py-16">
+        <h1 className="text-5xl font-bold mb-6 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-600 bg-clip-text text-transparent">
+          在线工具箱
+        </h1>
+        <p className="text-xl text-slate-600 dark:text-slate-300 max-w-2xl mx-auto">
+          简单、快速、免费的在线工具集合，让您的工作更高效
+        </p>
+      </section>
+
+      {/* Tools Grid */}
+      <section className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {tools.map((tool) => (
+          <Link
+            key={tool.id}
+            href={tool.href}
+            className="group bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg hover:shadow-xl transition-all duration-300 hover:-translate-y-1 border border-slate-200 dark:border-slate-700"
           >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+            <div className={`w-14 h-14 rounded-xl bg-gradient-to-br ${tool.color} flex items-center justify-center mb-4 group-hover:scale-110 transition-transform`}>
+              <tool.icon className="w-7 h-7 text-white" />
+            </div>
+            <h2 className="text-xl font-semibold mb-2 text-slate-800 dark:text-white">
+              {tool.name}
+            </h2>
+            <p className="text-slate-600 dark:text-slate-400 mb-4">
+              {tool.description}
+            </p>
+            <div className="flex items-center text-blue-600 dark:text-blue-400 font-medium">
+              立即使用
+              <ArrowRight className="w-4 h-4 ml-1 group-hover:translate-x-1 transition-transform" />
+            </div>
+          </Link>
+        ))}
+      </section>
+
+      {/* Features */}
+      <section className="mt-20 text-center">
+        <h2 className="text-3xl font-bold mb-8 text-slate-800 dark:text-white">
+          为什么选择我们？
+        </h2>
+        <div className="grid md:grid-cols-3 gap-8">
+          <div className="p-6">
+            <div className="text-4xl mb-4">🚀</div>
+            <h3 className="text-lg font-semibold mb-2">快速便捷</h3>
+            <p className="text-slate-600 dark:text-slate-400">无需注册，即开即用，快速完成任务</p>
+          </div>
+          <div className="p-6">
+            <div className="text-4xl mb-4">🔒</div>
+            <h3 className="text-lg font-semibold mb-2">安全可靠</h3>
+            <p className="text-slate-600 dark:text-slate-400">数据安全处理，保护您的隐私</p>
+          </div>
+          <div className="p-6">
+            <div className="text-4xl mb-4">💯</div>
+            <h3 className="text-lg font-semibold mb-2">完全免费</h3>
+            <p className="text-slate-600 dark:text-slate-400">所有工具永久免费使用</p>
+          </div>
         </div>
-      </main>
+      </section>
     </div>
   );
 }
