@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { urlStore } from "@/lib/redis";
+import { urlStore } from "@/lib/storage";
 
 export async function GET(
   request: NextRequest,

@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import { urlStore, UrlEntry } from "@/lib/redis";
+import { urlStore, UrlEntry } from "@/lib/storage";
 
 export async function POST(request: NextRequest) {
   try {
