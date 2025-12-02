@@ -179,10 +179,10 @@ export default function PagesToWordPage() {
           )}
         </div>
       </div>
-
+{/* 
       <p className="mt-4 text-center text-xs text-slate-400">
         需要安装 LibreOffice 转换引擎
-      </p>
+      </p> */}
     </div>
   );
 }
