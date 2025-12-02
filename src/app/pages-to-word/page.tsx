@@ -176,7 +176,10 @@ export default function PagesToWordPage() {
           className="w-full mt-4 py-3 px-6 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-medium hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
         >
           {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+            <>
+              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
+              <span>正在转换，请稍候...</span>
+            </>
           ) : (
             <>
               <FileText className="w-5 h-5" />
@@ -211,24 +214,15 @@ export default function PagesToWordPage() {
       )}
 
       {/* Info Section */}
-      <div className="mt-8 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-        <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">
-          ⚠️ 重要提示
+      <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
+        <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">
+          ✨ 使用 CloudConvert 专业转换引擎
         </h4>
-        <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
-          <li>• 本工具尝试提取 Pages 文件中的纯文本内容</li>
-          <li>• Apple Pages 使用专有的 IWA 二进制格式，无法完美解析</li>
-          <li>• <strong>图片、表格、样式等将无法保留</strong></li>
-          <li>• 复杂文档可能出现内容缺失或顺序错乱</li>
+        <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
+          <li>• 高质量转换，保留原始格式和排版</li>
+          <li>• 支持图片、表格、样式等复杂内容</li>
+          <li>• 文件在服务器端安全处理后自动删除</li>
         </ul>
-        <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
-          <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
-            💡 推荐方案
-          </p>
-          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
-            在 Mac 上打开 Pages → 文件 → 导出到 → Word，可获得完美转换效果。
-          </p>
-        </div>
       </div>
     </div>
   );
