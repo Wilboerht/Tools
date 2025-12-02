@@ -1,42 +1,27 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-import fs from "fs";
-import path from "path";
 
-// 使用JSON文件存储短链接映射（生产环境建议使用数据库）
-const DATA_FILE = path.join(process.cwd(), "data", "urls.json");
+interface UrlEntry {
+  url: string;
+  createdAt: string;
+  clicks: number;
+}
 
 interface UrlData {
-  [key: string]: {
-    url: string;
-    createdAt: string;
-    clicks: number;
-  };
+  [key: string]: UrlEntry;
 }
 
-function ensureDataDir() {
-  const dataDir = path.dirname(DATA_FILE);
-  if (!fs.existsSync(dataDir)) {
-    fs.mkdirSync(dataDir, { recursive: true });
-  }
-}
+// 使用内存存储（Vercel无服务器环境不支持文件系统持久化）
+// 注意：这意味着短链接在服务器重启后会丢失
+// 生产环境建议使用 Vercel KV、Upstash Redis 或其他数据库
+const memoryStore: UrlData = {};
 
 function readUrls(): UrlData {
-  ensureDataDir();
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const data = fs.readFileSync(DATA_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error reading URLs:", error);
-  }
-  return {};
+  return memoryStore;
 }
 
-function writeUrls(data: UrlData) {
-  ensureDataDir();
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
+function writeUrls(code: string, data: UrlEntry) {
+  memoryStore[code] = data;
 }
 
 export async function POST(request: NextRequest) {
@@ -78,13 +63,13 @@ export async function POST(request: NextRequest) {
 
     // 生成新的短码
     const code = nanoid(6);
-    urls[code] = {
+    const newEntry: UrlEntry = {
       url,
       createdAt: new Date().toISOString(),
       clicks: 0,
     };
 
-    writeUrls(urls);
+    writeUrls(code, newEntry);
 
     const host = request.headers.get("host") || "localhost:3000";
     const protocol = request.headers.get("x-forwarded-proto") || "http";

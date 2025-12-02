@@ -1,32 +1,19 @@
 import { NextRequest, NextResponse } from "next/server";
-import fs from "fs";
-import path from "path";
 
-const DATA_FILE = path.join(process.cwd(), "data", "urls.json");
+interface UrlEntry {
+  url: string;
+  createdAt: string;
+  clicks: number;
+}
 
 interface UrlData {
-  [key: string]: {
-    url: string;
-    createdAt: string;
-    clicks: number;
-  };
+  [key: string]: UrlEntry;
 }
 
-function readUrls(): UrlData {
-  try {
-    if (fs.existsSync(DATA_FILE)) {
-      const data = fs.readFileSync(DATA_FILE, "utf-8");
-      return JSON.parse(data);
-    }
-  } catch (error) {
-    console.error("Error reading URLs:", error);
-  }
-  return {};
-}
-
-function writeUrls(data: UrlData) {
-  fs.writeFileSync(DATA_FILE, JSON.stringify(data, null, 2));
-}
+// 共享内存存储（与shorturl API保持同步）
+// 注意：在Vercel无服务器环境中，每个函数实例有独立的内存
+// 这意味着短链接可能无法跨实例工作，生产环境建议使用数据库
+const memoryStore: UrlData = {};
 
 export async function GET(
   request: NextRequest,
@@ -34,16 +21,15 @@ export async function GET(
 ) {
   const { code } = await params;
 
-  const urls = readUrls();
-  const urlData = urls[code];
+  const urlData = memoryStore[code];
 
   if (!urlData) {
+    // 短链接不存在，重定向到短链接页面并显示错误
     return NextResponse.redirect(new URL("/shorturl?error=not_found", request.url));
   }
 
   // 增加点击计数
-  urls[code].clicks += 1;
-  writeUrls(urls);
+  memoryStore[code].clicks += 1;
 
   // 重定向到原始URL
   return NextResponse.redirect(urlData.url);
