@@ -216,13 +216,24 @@ export default function PagesToWordPage() {
       {/* Info Section */}
       <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
         <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">
-          ✨ 使用 CloudConvert 专业转换引擎
+          ✨ 使用 LibreOffice 开源转换引擎
         </h4>
         <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
           <li>• 高质量转换，保留原始格式和排版</li>
           <li>• 支持图片、表格、样式等复杂内容</li>
-          <li>• 文件在服务器端安全处理后自动删除</li>
+          <li>• 本地处理，无需上传到第三方服务器</li>
         </ul>
+      </div>
+
+      {/* Requirements */}
+      <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
+        <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">
+          ⚠️ 系统要求
+        </h4>
+        <p className="text-sm text-amber-700 dark:text-amber-400">
+          需要在服务器上安装 <a href="https://www.libreoffice.org/download/download/" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-600">LibreOffice</a>。
+          此功能仅支持本地运行或自建服务器，不支持 Vercel 等无服务器平台。
+        </p>
       </div>
     </div>
   );
