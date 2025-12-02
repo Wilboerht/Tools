@@ -75,122 +75,103 @@ export default function QRCodePage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-xl mx-auto px-4 py-12">
       {/* Header */}
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-purple-500 to-pink-500 flex items-center justify-center mx-auto mb-4">
-          <QrCode className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-          二维码生成器
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          将链接或文本转换为二维码图片
-        </p>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-slate-900 mb-1">二维码生成</h1>
+        <p className="text-sm text-slate-500">将链接或文本转换为二维码图片</p>
       </div>
 
-      {/* Input Section */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            输入内容
-          </label>
-          <textarea
-            value={text}
-            onChange={(e) => setText(e.target.value)}
-            placeholder="输入链接或任意文本..."
-            rows={3}
-            className="w-full px-4 py-3 rounded-xl border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-700 text-slate-800 dark:text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-purple-500 focus:border-transparent transition-all resize-none"
-          />
-        </div>
-
-        <div className="mb-4">
-          <label className="block text-sm font-medium text-slate-700 dark:text-slate-300 mb-2">
-            二维码尺寸: {size}px
-          </label>
-          <input
-            type="range"
-            min="100"
-            max="500"
-            step="50"
-            value={size}
-            onChange={(e) => setSize(Number(e.target.value))}
-            className="w-full h-2 bg-slate-200 dark:bg-slate-700 rounded-lg appearance-none cursor-pointer accent-purple-500"
-          />
-          <div className="flex justify-between text-xs text-slate-500 mt-1">
-            <span>100px</span>
-            <span>500px</span>
+      {/* Card */}
+      <div className="bg-white rounded-lg border border-slate-200 p-5">
+        <div className="space-y-4">
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              内容
+            </label>
+            <textarea
+              value={text}
+              onChange={(e) => setText(e.target.value)}
+              placeholder="输入链接或文本..."
+              rows={3}
+              className="w-full px-3 py-2 text-sm border border-slate-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent resize-none"
+            />
           </div>
-        </div>
 
-        {error && (
-          <div className="mb-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm">
-            {error}
+          <div>
+            <label className="block text-sm font-medium text-slate-700 mb-1.5">
+              尺寸: {size}px
+            </label>
+            <input
+              type="range"
+              min="100"
+              max="500"
+              step="50"
+              value={size}
+              onChange={(e) => setSize(Number(e.target.value))}
+              className="w-full h-1.5 bg-slate-200 rounded-lg appearance-none cursor-pointer accent-slate-900"
+            />
           </div>
-        )}
 
-        <button
-          onClick={generateQRCode}
-          disabled={loading}
-          className="w-full py-3 px-6 rounded-xl bg-gradient-to-r from-purple-500 to-pink-500 text-white font-medium hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-          ) : (
-            <>
-              <QrCode className="w-5 h-5" />
-              生成二维码
-            </>
+          {error && (
+            <div className="p-3 rounded-md bg-red-50 text-red-600 text-sm">
+              {error}
+            </div>
           )}
-        </button>
-      </div>
 
-      {/* Result Section */}
-      {qrCodeUrl && (
-        <div className="mt-6 bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
-          <div className="text-center">
-            <div className="inline-block p-4 bg-white rounded-xl shadow-inner mb-4">
-              <img
-                src={qrCodeUrl}
-                alt="QR Code"
-                className="mx-auto"
-                style={{ width: size, height: size }}
-              />
+          <button
+            onClick={generateQRCode}
+            disabled={loading}
+            className="w-full py-2 px-4 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-800 disabled:opacity-50 transition-colors"
+          >
+            {loading ? "生成中..." : "生成二维码"}
+          </button>
+
+          {qrCodeUrl && (
+            <div className="pt-4 border-t border-slate-200">
+              <div className="flex flex-col items-center">
+                <div className="p-3 bg-white border border-slate-200 rounded-lg mb-4">
+                  <img
+                    src={qrCodeUrl}
+                    alt="QR Code"
+                    style={{ width: Math.min(size, 200), height: Math.min(size, 200) }}
+                  />
+                </div>
+                <canvas ref={canvasRef} className="hidden" />
+                <div className="flex gap-2">
+                  <button
+                    onClick={downloadQRCode}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                  >
+                    <Download className="w-4 h-4" />
+                    下载
+                  </button>
+                  <button
+                    onClick={copyQRCode}
+                    className="flex items-center gap-1.5 px-3 py-1.5 text-sm border border-slate-300 rounded-md hover:bg-slate-50 transition-colors"
+                  >
+                    {copied ? (
+                      <>
+                        <Check className="w-4 h-4 text-green-600" />
+                        已复制
+                      </>
+                    ) : (
+                      <>
+                        <Copy className="w-4 h-4" />
+                        复制
+                      </>
+                    )}
+                  </button>
+                </div>
+              </div>
             </div>
-            <canvas ref={canvasRef} className="hidden" />
-            <div className="flex justify-center gap-3">
-              <button
-                onClick={downloadQRCode}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-700 dark:text-slate-300"
-              >
-                <Download className="w-4 h-4" />
-                下载图片
-              </button>
-              <button
-                onClick={copyQRCode}
-                className="flex items-center gap-2 px-4 py-2 rounded-lg bg-slate-100 dark:bg-slate-700 hover:bg-slate-200 dark:hover:bg-slate-600 transition-colors text-slate-700 dark:text-slate-300"
-              >
-                {copied ? (
-                  <>
-                    <Check className="w-4 h-4 text-green-500" />
-                    已复制
-                  </>
-                ) : (
-                  <>
-                    <Copy className="w-4 h-4" />
-                    复制图片
-                  </>
-                )}
-              </button>
-            </div>
-          </div>
+          )}
         </div>
-      )}
-
-      {/* Info Section */}
-      <div className="mt-8 text-center text-sm text-slate-500 dark:text-slate-400">
-        <p>💡 支持链接、文本、联系方式等任意内容</p>
       </div>
+
+      <p className="mt-4 text-center text-xs text-slate-400">
+        支持链接、文本、联系方式等任意内容
+      </p>
     </div>
   );
 }

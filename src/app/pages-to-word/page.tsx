@@ -96,145 +96,93 @@ export default function PagesToWordPage() {
   };
 
   return (
-    <div className="max-w-2xl mx-auto">
+    <div className="max-w-xl mx-auto px-4 py-12">
       {/* Header */}
-      <div className="text-center mb-10">
-        <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-orange-500 to-red-500 flex items-center justify-center mx-auto mb-4">
-          <FileText className="w-8 h-8 text-white" />
-        </div>
-        <h1 className="text-3xl font-bold text-slate-800 dark:text-white mb-2">
-          Pages 转 Word
-        </h1>
-        <p className="text-slate-600 dark:text-slate-400">
-          将 Apple Pages 文档转换为 Microsoft Word 格式
-        </p>
+      <div className="mb-6">
+        <h1 className="text-xl font-semibold text-slate-900 mb-1">Pages 转 Word</h1>
+        <p className="text-sm text-slate-500">将 Apple Pages 文档转换为 Microsoft Word 格式</p>
       </div>
 
-      {/* Upload Section */}
-      <div className="bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
-        <div
-          className={`border-2 border-dashed rounded-xl p-8 text-center transition-colors ${
-            dragActive
-              ? "border-orange-500 bg-orange-50 dark:bg-orange-900/20"
-              : "border-slate-300 dark:border-slate-600 hover:border-orange-400"
-          }`}
-          onDragEnter={handleDrag}
-          onDragLeave={handleDrag}
-          onDragOver={handleDrag}
-          onDrop={handleDrop}
-        >
-          <Upload className="w-12 h-12 mx-auto mb-4 text-slate-400" />
-          <p className="text-slate-600 dark:text-slate-400 mb-2">
-            拖放 .pages 文件到这里，或者
-          </p>
-          <label className="inline-block px-4 py-2 rounded-lg bg-orange-500 text-white cursor-pointer hover:bg-orange-600 transition-colors">
-            选择文件
-            <input
-              type="file"
-              accept=".pages"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </label>
-        </div>
-
-        {file && (
-          <div className="mt-4 p-4 bg-slate-50 dark:bg-slate-700 rounded-lg flex items-center justify-between">
-            <div className="flex items-center gap-3">
-              <FileText className="w-8 h-8 text-orange-500" />
-              <div>
-                <p className="font-medium text-slate-800 dark:text-white">
-                  {file.name}
-                </p>
-                <p className="text-sm text-slate-500">
-                  {(file.size / 1024 / 1024).toFixed(2)} MB
-                </p>
-              </div>
-            </div>
-            <button
-              onClick={() => {
-                setFile(null);
-                setResult(null);
-              }}
-              className="text-slate-400 hover:text-slate-600"
-            >
-              ✕
-            </button>
-          </div>
-        )}
-
-        {error && (
-          <div className="mt-4 p-3 rounded-lg bg-red-50 dark:bg-red-900/30 text-red-600 dark:text-red-400 text-sm flex items-center gap-2">
-            <AlertCircle className="w-4 h-4" />
-            {error}
-          </div>
-        )}
-
-        <button
-          onClick={convertFile}
-          disabled={!file || loading}
-          className="w-full mt-4 py-3 px-6 rounded-xl bg-gradient-to-r from-orange-500 to-red-500 text-white font-medium hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2"
-        >
-          {loading ? (
-            <>
-              <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              <span>正在转换，请稍候...</span>
-            </>
-          ) : (
-            <>
-              <FileText className="w-5 h-5" />
-              开始转换
-            </>
-          )}
-        </button>
-      </div>
-
-      {/* Result Section */}
-      {result && (
-        <div className="mt-6 bg-white dark:bg-slate-800 rounded-2xl p-6 shadow-lg border border-slate-200 dark:border-slate-700">
-          <div className="text-center">
-            <div className="w-16 h-16 rounded-full bg-green-100 dark:bg-green-900/30 flex items-center justify-center mx-auto mb-4">
-              <FileText className="w-8 h-8 text-green-500" />
-            </div>
-            <h3 className="text-lg font-semibold text-slate-800 dark:text-white mb-2">
-              转换完成！
-            </h3>
-            <p className="text-slate-600 dark:text-slate-400 mb-4">
-              {result.filename}
+      {/* Card */}
+      <div className="bg-white rounded-lg border border-slate-200 p-5">
+        <div className="space-y-4">
+          <div
+            className={`border-2 border-dashed rounded-md p-6 text-center transition-colors ${
+              dragActive
+                ? "border-blue-500 bg-blue-50"
+                : "border-slate-300 hover:border-slate-400"
+            }`}
+            onDragEnter={handleDrag}
+            onDragLeave={handleDrag}
+            onDragOver={handleDrag}
+            onDrop={handleDrop}
+          >
+            <Upload className="w-8 h-8 mx-auto mb-2 text-slate-400" />
+            <p className="text-sm text-slate-600 mb-2">
+              拖放 .pages 文件到这里
             </p>
-            <button
-              onClick={downloadFile}
-              className="inline-flex items-center gap-2 px-6 py-3 rounded-xl bg-green-500 text-white font-medium hover:bg-green-600 transition-colors"
-            >
-              <Download className="w-5 h-5" />
-              下载 Word 文档
-            </button>
+            <label className="inline-block px-3 py-1.5 text-sm border border-slate-300 rounded-md cursor-pointer hover:bg-slate-50 transition-colors">
+              选择文件
+              <input
+                type="file"
+                accept=".pages"
+                onChange={handleFileChange}
+                className="hidden"
+              />
+            </label>
           </div>
+
+          {file && (
+            <div className="p-3 bg-slate-50 rounded-md flex items-center justify-between">
+              <div className="flex items-center gap-2">
+                <FileText className="w-5 h-5 text-slate-600" />
+                <div>
+                  <p className="text-sm font-medium text-slate-800">{file.name}</p>
+                  <p className="text-xs text-slate-500">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+                </div>
+              </div>
+              <button
+                onClick={() => { setFile(null); setResult(null); }}
+                className="text-slate-400 hover:text-slate-600 text-sm"
+              >
+                ✕
+              </button>
+            </div>
+          )}
+
+          {error && (
+            <div className="p-3 rounded-md bg-red-50 text-red-600 text-sm flex items-center gap-2">
+              <AlertCircle className="w-4 h-4" />
+              {error}
+            </div>
+          )}
+
+          <button
+            onClick={convertFile}
+            disabled={!file || loading}
+            className="w-full py-2 px-4 bg-slate-900 text-white text-sm font-medium rounded-md hover:bg-slate-800 disabled:cursor-not-allowed transition-colors"
+          >
+            {loading ? "转换中..." : "开始转换"}
+          </button>
+
+          {result && (
+            <div className="pt-4 border-t border-slate-200 text-center">
+              <p className="text-sm text-green-600 mb-3">✓ 转换完成：{result.filename}</p>
+              <button
+                onClick={downloadFile}
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-green-600 text-white text-sm font-medium rounded-md hover:bg-green-700 transition-colors"
+              >
+                <Download className="w-4 h-4" />
+                下载文件
+              </button>
+            </div>
+          )}
         </div>
-      )}
-
-      {/* Info Section */}
-      <div className="mt-8 bg-blue-50 dark:bg-blue-900/20 rounded-xl p-4 border border-blue-200 dark:border-blue-800">
-        <h4 className="font-medium text-blue-800 dark:text-blue-300 mb-2">
-          ✨ 使用 LibreOffice 开源转换引擎
-        </h4>
-        <ul className="text-sm text-blue-700 dark:text-blue-400 space-y-1">
-          <li>• 高质量转换，保留原始格式和排版</li>
-          <li>• 支持图片、表格、样式等复杂内容</li>
-          <li>• 本地处理，无需上传到第三方服务器</li>
-        </ul>
       </div>
 
-      {/* Requirements */}
-      <div className="mt-4 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
-        <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">
-          ⚠️ 系统要求
-        </h4>
-        <p className="text-sm text-amber-700 dark:text-amber-400">
-          需要在服务器上安装 <a href="https://www.libreoffice.org/download/download/" target="_blank" rel="noopener noreferrer" className="underline hover:text-amber-600">LibreOffice</a>。
-          此功能仅支持本地运行或自建服务器，不支持 Vercel 等无服务器平台。
-        </p>
-      </div>
+      <p className="mt-4 text-center text-xs text-slate-400">
+        需要安装 LibreOffice 转换引擎
+      </p>
     </div>
   );
 }
