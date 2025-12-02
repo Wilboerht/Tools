@@ -1,28 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { nanoid } from "nanoid";
-
-interface UrlEntry {
-  url: string;
-  createdAt: string;
-  clicks: number;
-}
-
-interface UrlData {
-  [key: string]: UrlEntry;
-}
-
-// 使用内存存储（Vercel无服务器环境不支持文件系统持久化）
-// 注意：这意味着短链接在服务器重启后会丢失
-// 生产环境建议使用 Vercel KV、Upstash Redis 或其他数据库
-const memoryStore: UrlData = {};
-
-function readUrls(): UrlData {
-  return memoryStore;
-}
-
-function writeUrls(code: string, data: UrlEntry) {
-  memoryStore[code] = data;
-}
+import { urlStore, UrlEntry } from "@/lib/redis";
 
 export async function POST(request: NextRequest) {
   try {
@@ -45,20 +23,17 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const urls = readUrls();
-
     // 检查是否已存在相同URL
-    for (const [code, data] of Object.entries(urls)) {
-      if (data.url === url) {
-        const host = request.headers.get("host") || "localhost:3000";
-        const protocol = request.headers.get("x-forwarded-proto") || "http";
-        return NextResponse.json({
-          success: true,
-          shortUrl: `${protocol}://${host}/s/${code}`,
-          code,
-          isExisting: true,
-        });
-      }
+    const existingCode = await urlStore.findByUrl(url);
+    if (existingCode) {
+      const host = request.headers.get("host") || "localhost:3000";
+      const protocol = request.headers.get("x-forwarded-proto") || "http";
+      return NextResponse.json({
+        success: true,
+        shortUrl: `${protocol}://${host}/s/${existingCode}`,
+        code: existingCode,
+        isExisting: true,
+      });
     }
 
     // 生成新的短码
@@ -69,7 +44,7 @@ export async function POST(request: NextRequest) {
       clicks: 0,
     };
 
-    writeUrls(code, newEntry);
+    await urlStore.set(code, newEntry);
 
     const host = request.headers.get("host") || "localhost:3000";
     const protocol = request.headers.get("x-forwarded-proto") || "http";
@@ -99,8 +74,7 @@ export async function GET(request: NextRequest) {
     );
   }
 
-  const urls = readUrls();
-  const urlData = urls[code];
+  const urlData = await urlStore.get(code);
 
   if (!urlData) {
     return NextResponse.json(

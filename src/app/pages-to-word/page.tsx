@@ -213,13 +213,22 @@ export default function PagesToWordPage() {
       {/* Info Section */}
       <div className="mt-8 bg-amber-50 dark:bg-amber-900/20 rounded-xl p-4 border border-amber-200 dark:border-amber-800">
         <h4 className="font-medium text-amber-800 dark:text-amber-300 mb-2">
-          ⚠️ 使用提示
+          ⚠️ 重要提示
         </h4>
         <ul className="text-sm text-amber-700 dark:text-amber-400 space-y-1">
-          <li>• 支持 Apple Pages 文档格式 (.pages)</li>
-          <li>• 新版 Pages (2013+) 使用专有格式，可能无法完美保留所有样式</li>
-          <li>• 如需最佳效果，建议在 Mac 上使用 Pages 原生导出功能</li>
+          <li>• 本工具尝试提取 Pages 文件中的纯文本内容</li>
+          <li>• Apple Pages 使用专有的 IWA 二进制格式，无法完美解析</li>
+          <li>• <strong>图片、表格、样式等将无法保留</strong></li>
+          <li>• 复杂文档可能出现内容缺失或顺序错乱</li>
         </ul>
+        <div className="mt-3 pt-3 border-t border-amber-200 dark:border-amber-700">
+          <p className="text-sm text-amber-800 dark:text-amber-300 font-medium">
+            💡 推荐方案
+          </p>
+          <p className="text-sm text-amber-700 dark:text-amber-400 mt-1">
+            在 Mac 上打开 Pages → 文件 → 导出到 → Word，可获得完美转换效果。
+          </p>
+        </div>
       </div>
     </div>
   );

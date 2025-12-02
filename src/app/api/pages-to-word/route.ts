@@ -121,70 +121,123 @@ async function extractPagesContent(zip: JSZip): Promise<ExtractedContent> {
   }
 
   // 去重并过滤空内容
-  content.paragraphs = [...new Set(content.paragraphs)].filter(p => p.trim().length > 0);
+  content.paragraphs = [...new Set(content.paragraphs)]
+    .filter(p => p.trim().length > 0)
+    // 过滤太短的文本片段（可能是元数据碎片）
+    .filter(p => {
+      // 保留包含中文的短文本
+      if (/[\u4e00-\u9fff]/.test(p)) return p.length >= 2;
+      // 英文至少需要一个完整单词
+      return p.length >= 3;
+    })
+    // 合并看起来像同一段落的连续文本
+    .reduce((acc: string[], curr) => {
+      if (acc.length === 0) return [curr];
+
+      const last = acc[acc.length - 1];
+      // 如果当前文本很短且上一个不是完整句子，可能需要合并
+      if (curr.length < 20 &&
+          !last.endsWith("。") &&
+          !last.endsWith("！") &&
+          !last.endsWith("？") &&
+          !last.endsWith(".") &&
+          !last.endsWith("!") &&
+          !last.endsWith("?")) {
+        acc[acc.length - 1] = last + curr;
+      } else {
+        acc.push(curr);
+      }
+      return acc;
+    }, []);
 
   return content;
 }
 
 function extractTextFromXml(xml: string): string[] {
   const texts: string[] = [];
-  
-  // 简单的XML文本提取
+
+  // 移除 XML 声明和注释
+  const cleanXml = xml
+    .replace(/<\?xml[^?]*\?>/g, "")
+    .replace(/<!--[\s\S]*?-->/g, "");
+
+  // 提取 XML 标签之间的文本内容
   const textRegex = />([^<]+)</g;
   let match;
-  
-  while ((match = textRegex.exec(xml)) !== null) {
-    const text = match[1].trim();
+
+  while ((match = textRegex.exec(cleanXml)) !== null) {
+    let text = match[1].trim();
+
+    // 解码 XML 实体
+    text = text
+      .replace(/&lt;/g, "<")
+      .replace(/&gt;/g, ">")
+      .replace(/&amp;/g, "&")
+      .replace(/&quot;/g, '"')
+      .replace(/&apos;/g, "'")
+      .replace(/&#(\d+);/g, (_, code) => String.fromCharCode(parseInt(code, 10)))
+      .replace(/&#x([0-9a-fA-F]+);/g, (_, code) => String.fromCharCode(parseInt(code, 16)));
+
     // 过滤掉明显的元数据
-    if (text && 
-        text.length > 1 && 
+    if (text &&
+        text.length > 1 &&
         !text.startsWith("xmlns") &&
         !text.includes("http://") &&
+        !text.includes("https://") &&
         !text.includes("apple.com") &&
+        !text.includes("schemas.openxmlformats") &&
         !/^[0-9a-f-]{36}$/i.test(text) && // UUID
-        !/^[A-Z]{2,}$/.test(text)) { // 全大写标识符
+        !/^[A-Z_]{2,}$/.test(text) && // 全大写标识符
+        !/^[\d.]+$/.test(text) && // 纯数字
+        !/^[a-zA-Z0-9+/=]{50,}$/.test(text)) { // Base64
       texts.push(text);
     }
   }
-  
+
   return texts;
 }
 
 function extractTextFromIwa(data: Uint8Array): string[] {
   const texts: string[] = [];
-  let currentText: number[] = [];
-  
-  for (let i = 0; i < data.length; i++) {
-    const byte = data[i];
-    
-    // 可打印ASCII字符或常见换行符
-    if ((byte >= 32 && byte < 127) || byte === 10 || byte === 13) {
-      currentText.push(byte);
-    } else {
-      if (currentText.length > 5) { // 至少5个字符
-        const text = String.fromCharCode(...currentText).trim();
-        // 过滤掉明显的元数据
-        if (text && 
-            !text.startsWith("TSWP") && 
-            !text.startsWith("TSP") &&
-            !text.startsWith("TST") &&
-            !text.includes("protobuf") &&
-            text.length > 3) {
-          texts.push(text);
-        }
+
+  // IWA 文件使用 protobuf 格式，文本通常以 UTF-8 编码存储
+  // 我们需要找到 UTF-8 字符串序列
+
+  // 尝试用 TextDecoder 解码整个文件，然后提取可读文本
+  const decoder = new TextDecoder("utf-8", { fatal: false });
+  const fullText = decoder.decode(data);
+
+  // 使用正则提取连续的可读文本（包括中文、日文、韩文等）
+  // 匹配：中文字符、日文假名、韩文、字母、数字、常见标点
+  const textPattern = /[\u4e00-\u9fff\u3040-\u309f\u30a0-\u30ff\uac00-\ud7af\u0020-\u007e\u00a0-\u00ff，。！？、；：""''（）【】《》\n\r\t]+/g;
+
+  let match;
+  while ((match = textPattern.exec(fullText)) !== null) {
+    let text = match[0].trim();
+
+    // 过滤掉明显的元数据和垃圾
+    if (text.length > 2 &&
+        !text.startsWith("TSWP") &&
+        !text.startsWith("TSP") &&
+        !text.startsWith("TST") &&
+        !text.startsWith("TSK") &&
+        !text.startsWith("TSD") &&
+        !text.includes("protobuf") &&
+        !text.includes("apple.com") &&
+        !text.includes("iWork") &&
+        !/^[A-Z_]{3,}$/.test(text) && // 全大写标识符
+        !/^[0-9a-f-]{30,}$/i.test(text) && // UUID
+        !/^[\x00-\x1f\s]+$/.test(text)) { // 控制字符
+
+      // 清理文本中的乱码字符
+      text = text.replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, "");
+
+      if (text.trim().length > 1) {
+        texts.push(text.trim());
       }
-      currentText = [];
     }
   }
-  
-  // 处理最后的文本
-  if (currentText.length > 5) {
-    const text = String.fromCharCode(...currentText).trim();
-    if (text) {
-      texts.push(text);
-    }
-  }
-  
+
   return texts;
 }
 
